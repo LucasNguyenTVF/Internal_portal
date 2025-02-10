@@ -1,35 +1,71 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+const orgData = {
+  profiles: [
+    {
+      name: "Aaron Lai",
+      position: "Managing Director",
+      image:
+        "https://plus.unsplash.com/premium_photo-1681433426886-3d6d17f79d53?q=80&w=2029&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+    {
+      name: "Rainy Nguyen",
+      position: "Delivery Managing",
+      image:
+        "https://plus.unsplash.com/premium_photo-1681433426886-3d6d17f79d53?q=80&w=2029&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+  ],
+  buttons: ["Line JP++", "Line Global", "PQA", "BOD"],
+};
 
+const Homepage = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="p-6">
+        <div className="flex justify-center gap-4 mb-10">
+          <div className="bg-gray-700 text-white px-4 py-2 rounded-md">
+            Man-months: xx
+          </div>
+          <div className="bg-gray-700 text-white px-4 py-2 rounded-md">
+            Total Members: xx
+          </div>
+        </div>
 
-export default App
+        <div className="flex justify-center gap-6 flex-wrap mb-10">
+          {orgData.profiles.map((profile, index) => (
+            <div
+              key={index}
+              className="w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md"
+            >
+              <div className="w-full h-40 bg-gray-200 flex items-center justify-center">
+                <img
+                  src={profile.image}
+                  alt={profile.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-4 text-center">
+                <h3 className="text-lg font-semibold mb-1">{profile.name}</h3>
+                <p className="text-gray-600">{profile.position}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-center gap-4 flex-wrap">
+          {orgData.buttons.map((buttonText, index) => (
+            <button
+              key={index}
+              className="min-w-[120px] px-6 py-2 border border-gray-900 bg-white rounded-md hover:bg-gray-100 transition"
+              onClick={() => console.log(`Clicked: ${buttonText}`)}
+            >
+              {buttonText}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Homepage;
