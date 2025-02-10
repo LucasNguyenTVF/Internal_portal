@@ -16,9 +16,27 @@ const orgData = {
     },
   ],
   buttons: ["Line JP++", "Line Global", "PQA", "BOD"],
+  subMenu: {
+    "Line JP++": ["Lucas Nguyen", "Lucas Nguyen", "Lucas Nguyen"],
+    "Line Global": ["Lucas Thai", "Lucas Thai", "Lucas Thai"],
+    PQA: ["Harry Trinh", "Harry Trinh", "Harry Trinh"],
+    BOD: ["Maily Nguyen", "Maily Nguyen", "Maily Nguyen"],
+  },
 };
 
 const Homepage = () => {
+  const [selectedMenu, setSelectedMenu] = React.useState("Line JP++");
+  const [hide, setHide] = React.useState(false);
+
+  const openSubMenu = (subMenu) => {
+    if (selectedMenu === subMenu) {
+      setHide(!hide);
+      return;
+    }
+    setSelectedMenu(subMenu);
+    setHide(true);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="p-6">
@@ -30,7 +48,6 @@ const Homepage = () => {
             Total Members: xx
           </div>
         </div>
-
         <div className="flex justify-center gap-6 flex-wrap mb-10">
           {orgData.profiles.map((profile, index) => (
             <div
@@ -57,12 +74,41 @@ const Homepage = () => {
             <button
               key={index}
               className="min-w-[120px] px-6 py-2 border border-gray-900 bg-white rounded-md hover:bg-gray-100 transition"
-              onClick={() => console.log(`Clicked: ${buttonText}`)}
+              onClick={() => openSubMenu(buttonText)}
             >
               {buttonText}
             </button>
           ))}
         </div>
+        {/* sub menu - hide on default */}
+        {hide && (
+          <>
+            <div className="mt-10 flex flex-wrap gap-4">
+              {orgData.subMenu[selectedMenu].map((item, index) => (
+                <div
+                  key={index}
+                  className="w-60 border border-gray-300 rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow"
+                >
+                  <div className="text-lg font-semibold text-purple-600">
+                    {item.title}
+                  </div>
+                  <div className="flex justify-center mt-4">
+                    <div className="w-16 h-16 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center">
+                      <span className="text-sm text-gray-400">photo</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 text-center">
+                    <div className="text-blue-500 font-medium">{item.name}</div>
+                    <div className="text-gray-400 text-sm">{item.pronouns}</div>
+                  </div>
+                  <div className="mt-4 text-gray-600 text-sm">
+                    {item.description}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
