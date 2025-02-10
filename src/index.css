@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "primereact/resources/themes/lara-light-cyan/theme.css";
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -70,4 +71,20 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+.p-organizationchart .p-organizationchart-line-left {
+  border-color: #b3b3b3;
+}
+
+.p-organizationchart .p-organizationchart-line-right {
+  border-color: #b3b3b3;
+}
+
+.p-organizationchart .p-organizationchart-line-top {
+  border-color: #b3b3b3;
+}
+
+.p-organizationchart .p-organizationchart-line-down {
+  background: #b3b3b3;
 }
