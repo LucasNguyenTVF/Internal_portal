@@ -1,77 +1,5 @@
-import { useState } from "react";
 import { OrganizationChart } from "primereact/organizationchart";
-
-export default function SelectionDemo() {
-  const [selection, setSelection] = useState([]);
-  const [data] = useState([
-    {
-      expanded: true,
-      type: "person",
-      data: {
-        image:
-          "https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png",
-        name: "Amy Elsner",
-        title: "CEO",
-      },
-      children: [
-        {
-          expanded: true,
-          type: "person",
-          data: {
-            image:
-              "https://primefaces.org/cdn/primereact/images/avatar/annafali.png",
-            name: "Anna Fali",
-            title: "CMO",
-          },
-          children: [
-            {
-              expanded: false,
-              type: "person",
-              data: {
-                image:
-                  "https://primefaces.org/cdn/primereact/images/avatar/xuxuefeng.png",
-                name: "Xu Xuefeng",
-                title: "Marketing Manager",
-              },
-            },
-            {
-              expanded: false,
-              type: "person",
-              data: {
-                image:
-                  "https://primefaces.org/cdn/primereact/images/avatar/ivanmagalhaes.png",
-                name: "Ivan Magalhaes",
-                title: "Sales Manager",
-              },
-            },
-          ],
-        },
-        {
-          expanded: true,
-          type: "person",
-          data: {
-            image:
-              "https://primefaces.org/cdn/primereact/images/avatar/stephenshaw.png",
-            name: "Stephen Shaw",
-            title: "CTO",
-          },
-          children: [
-            {
-              expanded: true,
-              type: "person",
-              data: {
-                image:
-                  "https://primefaces.org/cdn/primereact/images/avatar/stephenshaw.png",
-                name: "Michael Zimmerman",
-                title: "Architect",
-              },
-            },
-          ],
-        },
-      ],
-    },
-  ]);
-
+export default function SelectionDemo({ data }) {
   const nodeTemplate = (node) => {
     if (node.type === "person") {
       return (
@@ -103,14 +31,17 @@ export default function SelectionDemo() {
   };
 
   return (
-    <div className="card overflow-x-auto">
-      <OrganizationChart
-        value={data}
-        selectionMode="multiple"
-        selection={selection}
-        onSelectionChange={(e) => setSelection(e.data)}
-        nodeTemplate={nodeTemplate}
-      />
+    <div className="card overflow-x-auto ">
+      {data.length > 0 && (
+        <OrganizationChart
+          value={data}
+          selectionMode="multiple"
+          // selection={selection}
+          // onSelectionChange={(e) => setSelection(e.data)}
+          onNodeSelect={(e) => console.log(e)}
+          nodeTemplate={nodeTemplate}
+        />
+      )}
     </div>
   );
 }
