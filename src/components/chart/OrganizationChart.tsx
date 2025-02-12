@@ -1,8 +1,10 @@
-import { memo, useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback, memo } from "react";
+
 import { traverseTree } from "../../utils/convertChartData";
 import ChartLevel from "./ChartLevel";
+import { EmployeeNode } from "../interfaces/employee";
 
-const OrganizationChart = ({ data }) => {
+const OrganizationChart = ({ data }: { data: EmployeeNode[] }) => {
   const levels = useMemo(() => traverseTree(data), [data]);
 
   const [visibleLevels, setVisibleLevels] = useState(
