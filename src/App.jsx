@@ -70,10 +70,11 @@ const Homepage = () => {
           image: item?.Image
             ? item?.Image
             : "https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png",
-          name: item.Name,
-          title: item.Title,
-          level: item.Level,
+          account: item.Account,
+          position: item.Position,
           line: item.Line,
+          fullName: item.Fullname,
+          email: item.Email,
         },
         children: [],
       });
@@ -92,7 +93,7 @@ const Homepage = () => {
     });
 
     const bosses = flatData.filter(
-      (item) => item.Line === "None" && item.Level === 0
+      (item) => item.Line === "None" && item.MemberOf === "None"
     );
 
     return {
@@ -108,7 +109,6 @@ const Homepage = () => {
         const arrayBuffer = await response.arrayBuffer();
         const workbook = xlsx.read(arrayBuffer, { type: "array" });
         const sheetName = workbook.SheetNames;
-        console.log("🚀 ~ fetchData ~ workbook:", workbook);
         const listEmployee = sheetName[0];
         const listTarget = sheetName[1];
 
@@ -132,6 +132,7 @@ const Homepage = () => {
       // convert excel employee data to primereact data
       const afterconvert = convertExcelToPrimeReactData(employeeList);
       const afterToHierarchy = convertToHierarchy(afterconvert.data);
+      console.log("🚀 ~ useEffect ~ afterToHierarchy:", afterToHierarchy);
       setBosses(afterToHierarchy.bosses);
       setData(afterToHierarchy.data);
       setLines(afterconvert.lines);
@@ -182,15 +183,15 @@ const Homepage = () => {
                   <div className="w-full h-40 bg-gray-200 flex items-center justify-center">
                     <img
                       src={profile.Image}
-                      alt={profile.Name}
+                      alt={profile.fullName}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="p-4 text-center">
                     <h3 className="text-lg font-semibold mb-1">
-                      {profile.Name}
+                      {profile.Account}
                     </h3>
-                    <p className="text-gray-600">{profile.Title}</p>
+                    <p className="text-gray-600">{profile.Position}</p>
                   </div>
                 </div>
               ))}{" "}
@@ -215,7 +216,6 @@ const Homepage = () => {
         {/* sub menu - hide on default */}
         {hide && (
           <div className="mt-3">
-            {/* <ZoomableView></ZoomableView> */}
             <SelectionDemo data={selection} />
           </div>
         )}
