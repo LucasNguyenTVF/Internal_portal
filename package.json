@@ -10,12 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@dabeng/react-orgchart": "^1.0.3",
-    "@tailwindcss/vite": "^4.0.5",
-    "primereact": "^10.9.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "tailwindcss": "^4.0.5"
+    "@tailwindcss/vite": "4.0.5",
+    "dagre": "0.8.5",
+    "primereact": "10.9.2",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-modal": "3.16.3",
+    "tailwindcss": "4.0.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

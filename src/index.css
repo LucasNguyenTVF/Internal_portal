@@ -16,6 +16,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@layer base {
+  #root {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: #fff;
+  }
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -71,20 +81,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
-
-.p-organizationchart .p-organizationchart-line-left {
-  border-color: #b3b3b3;
-}
-
-.p-organizationchart .p-organizationchart-line-right {
-  border-color: #b3b3b3;
-}
-
-.p-organizationchart .p-organizationchart-line-top {
-  border-color: #b3b3b3;
-}
-
-.p-organizationchart .p-organizationchart-line-down {
-  background: #b3b3b3;
 }
