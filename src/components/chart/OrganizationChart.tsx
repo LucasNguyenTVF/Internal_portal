@@ -42,7 +42,7 @@ const OrganizationChart = ({ data }: { data: EmployeeNode[] }) => {
         </div>
       {!!childrenData.length && (
         <div ref={childrenRef} className="flex flex-row flex-wrap justify-center items-start gap-x-2 md:gap-x-4 lg:gap-x-6 gap-y-3 md:gap-y-6 lg:gap-y-8 m-3 md:m-4 lg:m-6">
-          {[...childrenData,...childrenData,...childrenData,...childrenData].map((child) => (
+          {childrenData?.map((child) => (
             // <div key={child?.data?.id} className="justify-center items-start gap-x-6 gap-y-15">
               <ChartLevel
                 node={child}
