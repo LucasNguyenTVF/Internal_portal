@@ -30,7 +30,6 @@ const transformExcelDataToHierarchy = (excelData) => {
       headers.forEach((key) => {
         const columnName = titleColumn[key];
         const value = row[key];
-
         if (value !== undefined) {
           parsedRow[columnName] = value;
 
@@ -56,6 +55,7 @@ const parseDataFromAPI = (data: EmployeeDataFromAPI): EmployeeData => {
     line: data?.Line,
     fullName: data?.Fullname,
     email: data?.Email,
+    managerName: data?.ManagerName,
   };
 };
 
@@ -119,7 +119,8 @@ const Homepage = () => {
         const sheetName = workbook.SheetNames;
         const listEmployee = sheetName[0];
         const worksheet = workbook.Sheets[listEmployee];
-        const jsonData: EmployeeDataFromAPI[] = xlsx.utils.sheet_to_json(worksheet);
+        const jsonData: EmployeeDataFromAPI[] =
+          xlsx.utils.sheet_to_json(worksheet);
         setEmployeeList(jsonData);
       } catch (error) {
         console.error("Error fetching or parsing the Excel file:", error);

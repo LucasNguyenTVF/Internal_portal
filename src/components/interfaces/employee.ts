@@ -6,6 +6,7 @@ export interface EmployeeData {
   line: string;
   fullName: string;
   email: string;
+  managerName: string;
 }
 
 export interface EmployeeNode {
@@ -24,5 +25,6 @@ export interface EmployeeDataFromAPI {
   Fullname: string;
   Email: string;
   ManagerId: string;
+  ManagerName: string;
   Leadership: boolean;
 }

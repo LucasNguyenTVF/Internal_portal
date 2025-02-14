@@ -59,7 +59,7 @@ const InfoDetailModal = forwardRef<ModalRef, any>((_, ref) => {
       borderRadius: 20,
       backgroundColor: "#06234F",
       border: "none",
-      maxHeight: "70vh",
+      maxHeight: "75vh",
       overflowY: "auto",
       scrollbarWidth: "none",
     },
@@ -123,15 +123,15 @@ const InfoDetailModal = forwardRef<ModalRef, any>((_, ref) => {
           </div>
           <div>
             <p className="text-sm md:text-lg mb-2 font-semibold">Location:</p>
-            <span className="text-xs md:text-sm text-[#d8d8d8]">{detailInfo?.data?.location ?? "Da Nang, Viet Nam"}</span>
+            <span className="text-xs md:text-sm text-[#d8d8d8]">Da Nang, Viet Nam</span>
           </div>
           <div>
             <p className="text-sm md:text-lg mb-2 font-semibold">Working Hour:</p>
-            <span className="text-xs md:text-sm text-[#d8d8d8]">{detailInfo?.data?.workingHour ?? "08:30 - 17:30"}</span>
+            <span className="text-xs md:text-sm text-[#d8d8d8]">08:30 - 17:30</span>
           </div>
           <div>
             <p className="text-sm md:text-lg mb-2 font-semibold">Departure:</p>
-            <span className="text-xs md:text-sm text-[#d8d8d8]">{detailInfo?.data?.departure ?? "D3"}</span>
+            <span className="text-xs md:text-sm text-[#d8d8d8]">D3</span>
           </div>
           <div>
             <p className="text-sm md:text-lg mb-2 font-semibold">Job Title:</p>
@@ -139,7 +139,7 @@ const InfoDetailModal = forwardRef<ModalRef, any>((_, ref) => {
           </div>
           <div>
             <p className="text-sm md:text-lg mb-2 font-semibold">Report to:</p>
-            <span className="text-xs md:text-sm text-[#d8d8d8]"></span>
+            <span className="text-xs md:text-sm text-[#d8d8d8]">{detailInfo?.data?.managerName !== "None" ? detailInfo?.data?.managerName : "Aaron Lai" }</span>
           </div>
         </div>
       </div>
