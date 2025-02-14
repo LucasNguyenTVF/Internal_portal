@@ -1,14 +1,16 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 @import "primereact/resources/themes/lara-light-cyan/theme.css";
+@import "tailwindcss";
+
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Plus Jakarta Sans",Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #f1f1f1;
+  color: rgba(28, 28, 28, 0.87);
+  background-color: #080F21;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -22,7 +24,23 @@
     padding: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    background-color: #fff;
+  }
+}
+
+@layer utilities {
+  .bg-primary {
+    background-color: #080F21 !important;
+  }
+  .text-primary {
+    color: "white" !important;
+  }
+  .border-primary {
+    border-color: #ffffff0D !important;
+  }
+  .text-md {
+    font-size: "16px";
+    font-weight: 400;
+    line-height: 20px;
   }
 }
 
@@ -41,19 +59,33 @@ body {
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 2.4em;
   line-height: 1.1;
+  color: "#fff";
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 1.8em;
+  line-height: 1.1;
+  font-weight: 700;
+  color: "#fff";
 }
 
 h3 {
-  font-size: 1.6em;
+  font-size: 1.2em;
   line-height: 1.1;
-  color: #101011;
+  color: #fff;
+  font-weight: 600;
+}
+
+p {
+  color: #fff;
 }
 
 button {
   border-radius: 8px;
-  padding: 0.6em 1.2em;
+  /* padding: 0.6em 1.2em; */
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
@@ -67,7 +99,7 @@ button:hover {
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 0px auto -webkit-focus-ring-color;
 }
 
 @media (prefers-color-scheme: light) {

@@ -23,6 +23,6 @@ export interface EmployeeDataFromAPI {
   Line: string;
   Fullname: string;
   Email: string;
-  MemberOf: string;
+  ManagerId: string;
   Leadership: boolean;
 }

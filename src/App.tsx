@@ -47,12 +47,6 @@ const transformExcelDataToHierarchy = (excelData) => {
   return { data: parsedData, lines: Array.from(lines) as Array<string> };
 };
 
-const convertListTargetToUsableData = (listTarget) => {
-  if (!Array.isArray(listTarget) || listTarget.length === 0) {
-    return [];
-  }
-};
-
 const parseDataFromAPI = (data: EmployeeDataFromAPI): EmployeeData => {
   return {
     id: data?.ID,
@@ -80,12 +74,12 @@ const buildEmployeeHierarchy = (flatData: EmployeeDataFromAPI[]) => {
 
   flatData.forEach((item: EmployeeDataFromAPI) => {
     const node = idMap.get(item.ID);
-    if (item.MemberOf === "None") {
+    if (item.ManagerId === "None") {
       if (node) {
         rootNodes.push(node);
       }
     } else {
-      const parent = idMap.get(item.MemberOf);
+      const parent = idMap.get(item.ManagerId);
       if (parent && node) {
         parent.children.push(node);
       }
@@ -103,11 +97,10 @@ const buildEmployeeHierarchy = (flatData: EmployeeDataFromAPI[]) => {
 };
 
 const Homepage = () => {
-  const [selectedMenu, setSelectedMenu] = useState("Line JP++");
+  const [selectedMenu, setSelectedMenu] = useState("");
   const [isShow, setIsShow] = React.useState(false);
-
+  const [loading, setLoading] = React.useState(false);
   const [employeeList, setEmployeeList] = useState<EmployeeDataFromAPI[]>([]);
-  const [targetList, setTargetList] = useState([]);
   const [internalPortalData, setInternalPortalData] = useState<EmployeeNode[]>(
     []
   );
@@ -125,20 +118,13 @@ const Homepage = () => {
         const workbook = xlsx.read(arrayBuffer, { type: "array" });
         const sheetName = workbook.SheetNames;
         const listEmployee = sheetName[0];
-        // const listTarget = sheetName[1];
-
-        // const worksheetTarget = workbook.Sheets[listTarget];
-        // const jsonDataTarget = xlsx.utils.sheet_to_json(worksheetTarget);
-        // setTargetList(jsonDataTarget);
         const worksheet = workbook.Sheets[listEmployee];
-        const jsonData = xlsx.utils.sheet_to_json(worksheet);
-
+        const jsonData: EmployeeDataFromAPI[] = xlsx.utils.sheet_to_json(worksheet);
         setEmployeeList(jsonData);
       } catch (error) {
         console.error("Error fetching or parsing the Excel file:", error);
       }
     };
-
     fetchData();
   }, []);
 
@@ -148,7 +134,6 @@ const Homepage = () => {
         transformExcelDataToHierarchy(employeeList);
       const { lines } = transformedEmployeeData;
       setLines(lines);
-
       const employeeHierarchy = buildEmployeeHierarchy(
         transformedEmployeeData.data
       );
@@ -157,9 +142,6 @@ const Homepage = () => {
       });
       setLeaderShips(leaderships);
       setInternalPortalData(employeeHierarchy.data);
-
-      // convert excel target data to primereact data
-      const afterconvertTarget = convertListTargetToUsableData(targetList);
     }
   }, [employeeList]);
 
@@ -168,32 +150,32 @@ const Homepage = () => {
       setIsShow(!isShow);
       return;
     }
-
+    setLoading(true);
     const selectedInternalPortalData = internalPortalData.filter(
       (item) => item.data.line === subMenu
     );
-
     if (selectedInternalPortalData.length === 0) {
       setIsShow(false);
+      setLoading(false);
       return;
     }
-
     setSelectedEmployees(selectedInternalPortalData);
     setSelectedMenu(subMenu);
     setIsShow(true);
+    setLoading(false);
   };
 
   return (
     <div>
       <Header />
-      <div className="min-h-screen m-10 p-6">
+      <div className="min-h-screen p-4 md:p-12">
         <Information
+          subMenu={selectedMenu}
           openSubMenu={openSubMenu}
           lines={lines}
           leaderships={leaderships}
-          // targets={targetList}
         />
-        {isShow && <OrganizationChart data={selectedEmployees} />}
+        {isShow && !loading && <OrganizationChart data={selectedEmployees} />}
       </div>
     </div>
   );

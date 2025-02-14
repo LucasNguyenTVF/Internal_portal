@@ -1,0 +1,8 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(10px); /* Làm mờ nội dung phía dưới */
+  background-color: rgba(0, 0, 0, 0.5); /* Màu nền có độ trong suốt */
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1); /* Viền dưới */
+}
