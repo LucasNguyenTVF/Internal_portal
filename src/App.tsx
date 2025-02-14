@@ -10,8 +10,15 @@ import {
   EmployeeDataFromAPI,
   EmployeeNode,
 } from "./components/interfaces/employee";
+import _ from "lodash";
 
 const linkExcel = import.meta.env.VITE_LINK_EXCEL;
+
+const defaultAvatar = "./assets/default_avatar.png";
+
+const isValidLineValue = (value: string) => {
+  return value !== "None" && typeof value === "string" && value !== "​";
+};
 
 const transformExcelDataToHierarchy = (excelData) => {
   if (!Array.isArray(excelData) || excelData.length === 0) {
@@ -21,6 +28,11 @@ const transformExcelDataToHierarchy = (excelData) => {
   const titleColumn = excelData[0];
   const headers = Object.keys(titleColumn).filter((key) => key !== "__EMPTY");
   const lines = new Set() as Set<string>;
+  const targets = [] as { columnName: string; value: string }[];
+
+  if (headers.length === 0) {
+    return { data: [], lines: [], targets: [] };
+  }
 
   const parsedData = excelData
     .slice(1)
@@ -34,8 +46,16 @@ const transformExcelDataToHierarchy = (excelData) => {
         if (value !== undefined) {
           parsedRow[columnName] = value;
 
-          if (columnName === "Line" && value !== "None") {
+          if (columnName === "Line" && isValidLineValue(value)) {
             lines.add(value);
+          }
+
+          if (columnName === "Total members" || columnName.includes("total")) {
+            targets.push({ columnName, value });
+          }
+
+          if (columnName === "Man-months" || columnName.includes("months")) {
+            targets.push({ columnName, value });
           }
         }
       });
@@ -44,7 +64,11 @@ const transformExcelDataToHierarchy = (excelData) => {
     })
     .filter((row) => Object.keys(row).length > 0) as EmployeeDataFromAPI[];
 
-  return { data: parsedData, lines: Array.from(lines) as Array<string> };
+  return {
+    data: parsedData,
+    lines: Array.from(lines) as Array<string>,
+    targets,
+  };
 };
 
 const convertListTargetToUsableData = (listTarget) => {
@@ -56,7 +80,7 @@ const convertListTargetToUsableData = (listTarget) => {
 const parseDataFromAPI = (data: EmployeeDataFromAPI): EmployeeData => {
   return {
     id: data?.ID,
-    image: data?.Image,
+    image: data?.Image ? data?.Image : defaultAvatar,
     account: data?.Account,
     position: data?.Position,
     line: data?.Line,
@@ -106,12 +130,15 @@ const Homepage = () => {
   const [selectedMenu, setSelectedMenu] = useState("Line JP++");
   const [isShow, setIsShow] = React.useState(false);
 
-  const [employeeList, setEmployeeList] = useState<EmployeeDataFromAPI[]>([]);
+  const [employeeList, setEmployeeList] = useState<any[]>([]);
   const [targetList, setTargetList] = useState([]);
   const [internalPortalData, setInternalPortalData] = useState<EmployeeNode[]>(
     []
   );
   const [lines, setLines] = useState<string[]>([]);
+  const [targets, setTargets] = useState<
+    { columnName: string; value: string }[]
+  >([]);
   const [leaderships, setLeaderShips] = useState<EmployeeData[]>([]);
   const [selectedEmployees, setSelectedEmployees] = useState<EmployeeNode[]>(
     []
@@ -146,9 +173,10 @@ const Homepage = () => {
     if (employeeList.length > 0) {
       const transformedEmployeeData =
         transformExcelDataToHierarchy(employeeList);
-      const { lines } = transformedEmployeeData;
-      setLines(lines);
 
+      const { lines, targets } = transformedEmployeeData;
+      setLines(lines);
+      setTargets(targets);
       const employeeHierarchy = buildEmployeeHierarchy(
         transformedEmployeeData.data
       );
@@ -191,7 +219,7 @@ const Homepage = () => {
           openSubMenu={openSubMenu}
           lines={lines}
           leaderships={leaderships}
-          // targets={targetList}
+          targets={targets}
         />
         {isShow && <OrganizationChart data={selectedEmployees} />}
       </div>

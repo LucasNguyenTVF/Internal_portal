@@ -5,23 +5,31 @@ interface InformationProps {
   openSubMenu: (buttonText: string) => void;
   lines: string[];
   leaderships: EmployeeData[];
+  targets: { columnName: string; value: string }[];
 }
 
 const Information = ({
   openSubMenu,
   lines,
   leaderships,
-}: // targets,
-InformationProps) => {
+  targets,
+}: InformationProps) => {
   return (
     <div>
       <div className="flex justify-center gap-4 mb-10">
-        <div className="bg-gray-700 text-white px-4 py-2 rounded-md">
-          Man-months: xx
-        </div>
-        <div className="bg-gray-700 text-white px-4 py-2 rounded-md">
-          Total Members: xx
-        </div>
+        {targets.length > 0 &&
+          targets.map((targetItem, index) => {
+            return (
+              <div
+                key={index}
+                className="bg-gray-700 text-white px-4 py-2 rounded-md"
+              >
+                <span>
+                  {targetItem.columnName}: {targetItem.value}
+                </span>
+              </div>
+            );
+          })}
       </div>
       <div className="flex justify-center gap-6 flex-wrap mb-10">
         {leaderships.map((profile, index) => (
