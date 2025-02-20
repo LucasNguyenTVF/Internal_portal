@@ -18,6 +18,10 @@ export interface EmployeeNode {
 }
 
 export type TypeNode = "person" | "block";
+export enum ETypeNode {
+  Person = "person",
+  Block = "block",
+}
 
 export interface EmployeeDataFromAPI {
   ID: string;

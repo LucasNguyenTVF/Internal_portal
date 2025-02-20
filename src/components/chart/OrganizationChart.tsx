@@ -1,6 +1,7 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import ChartLevel from "./ChartLevel";
-import { EmployeeNode } from "../interfaces/employee";
+import { EmployeeData, EmployeeNode } from "../interfaces/employee";
+import { EmployeeDirectory } from "../information/Employee";
 
 const findNodeRecursive = (
   nodes: EmployeeNode[],
@@ -96,28 +97,19 @@ const OrganizationChart = ({ data }: { data: EmployeeNode[] }) => {
   );
 
   const renderNode = (node: EmployeeNode) => {
-    console.log("🚀 ~ renderNode ~ node:", node);
     const isExpanded = expandedNodes.has(node.data.id);
     const { parent } = findNodeRecursive(data, node.data.id);
 
-    // Hide inactive siblings and their children
+    // Hide inactive siblings
     if (parent && activeChild && activeChild !== node.data.id) {
       if (parent.children?.some((child) => child.data.id === activeChild)) {
         return null;
       }
-
-      if (
-        parent.children?.map((child) =>
-          child.children.some((c) => c.data.id === activeChild)
-        )
-      ) {
-        return null;
-      }
-      // if (parent.children?.some((child) => child.data.id !== node.data.id)) {
-      //   return null;
-      // }
     }
 
+    const dataEmployess: EmployeeData[] = node.children.map(
+      (child) => child.data
+    );
     return (
       <div key={node.data.id} className="flex flex-col items-center">
         <ChartLevel
@@ -128,9 +120,16 @@ const OrganizationChart = ({ data }: { data: EmployeeNode[] }) => {
         {isExpanded && node.children && node.children.length > 0 && (
           <div
             ref={childrenRef}
-            className="flex flex-row flex-wrap justify-center items-start gap-x-2 md:gap-x-4 lg:gap-x-6 gap-y-3 md:gap-y-6 lg:gap-y-8 m-3 md:m-4 lg:m-6"
+            className="flex flex-row justify-center items-start gap-x-2 md:gap-x-4 lg:gap-x-6 gap-y-3 md:gap-y-6 lg:gap-y-8 m-3 md:m-4 lg:m-6"
           >
-            {node.children.map((child) => renderNode(child))}
+            {node.children.length > 6 ? (
+              <EmployeeDirectory
+                employees={dataEmployess}
+                reportTo={node.data.fullName}
+              />
+            ) : (
+              node.children.map((child) => renderNode(child))
+            )}
           </div>
         )}
       </div>
@@ -143,7 +142,7 @@ const OrganizationChart = ({ data }: { data: EmployeeNode[] }) => {
         className="overflow-y-scroll"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        <div className="flex flex-row justify-center w-fit my-6 mx-auto gap-x-2 md:gap-x-4 lg:gap-x-6">
+        <div className="flex flex-row flex-wrap justify-center w-fit my-6 mx-auto gap-x-2 md:gap-x-4 lg:gap-x-6">
           {data?.map((node) => renderNode(node))}
         </div>
       </div>

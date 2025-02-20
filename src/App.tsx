@@ -10,10 +10,9 @@ import {
   EmployeeDataFromAPI,
   EmployeeNode,
 } from "./components/interfaces/employee";
-import OrganizationStructure from "./org";
 
 const linkExcel = import.meta.env.VITE_LINK_EXCEL;
-const randomId = () => Math.random().toString(36).substr(2, 9);
+export const randomId = () => Math.random().toString(36).substr(2, 9);
 const parseDataFromAPI = (data: EmployeeDataFromAPI): EmployeeData => {
   if (!data) {
     return {
@@ -28,7 +27,7 @@ const parseDataFromAPI = (data: EmployeeDataFromAPI): EmployeeData => {
   }
 
   return {
-    id: data?.ID,
+    id: randomId(),
     image: data?.Image,
     account: data?.Account,
     position: data?.Position,
@@ -353,7 +352,7 @@ const Homepage = () => {
   return (
     <div>
       <Header />
-      <div className="min-h-screen p-4 md:p-12 overflow-auto">
+      <div className="min-h-screen p-4 md:p-12 overflow-y-auto">
         <Information
           subMenu={selectedMenu}
           openSubMenu={openSubMenu}
