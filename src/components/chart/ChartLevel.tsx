@@ -38,16 +38,20 @@ const ChartLevel = ({
                 : "w-32 sm:w-40 lg:w-50 h-32 sm:h-40 lg:h-50"
             } bg-[linear-gradient(90deg,_#03081A_0%,_#012756_100%)]`}
           >
-            <div className="w-12 sm:w-16 lg:w-20 h-12 sm:h-16 lg:h-20 rounded-full m-auto overflow-hidden">
-              <img
-                src={node?.data?.image}
-                alt={node?.data?.fullName}
-                className="w-full h-full object-cover"
-              />
-            </div>
+            {node.data.image ? (
+              <div className="w-12 sm:w-16 lg:w-20 h-12 sm:h-16 lg:h-20 rounded-full m-auto overflow-hidden">
+                <img
+                  src={node?.data?.image}
+                  alt={node?.data?.fullName}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <></>
+            )}
             <div className="text-center m-auto px-2">
               <div className="text-[10px] sm:text-sm lg:text-lg font-semibold text-white">
-                {node?.data?.account}
+                {node?.data?.account || node?.data?.nameBlock}
               </div>
               <div className="text-[10px] sm:text-xs lg:text-sm text-[#2A88FF] mt-2">
                 {node?.data?.position}
@@ -68,7 +72,7 @@ const ChartLevel = ({
                 isExpanded ? "italic" : ""
               } `}
             >
-              Show team
+              {"Show next"}
             </span>
           </button>
         )}

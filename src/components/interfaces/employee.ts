@@ -7,14 +7,17 @@ export interface EmployeeData {
   fullName: string;
   email: string;
   managerName: string;
+  nameBlock?: string;
 }
 
 export interface EmployeeNode {
   expanded: boolean;
-  type: string;
+  type: TypeNode;
   data: EmployeeData;
   children: EmployeeNode[];
 }
+
+export type TypeNode = "person" | "block";
 
 export interface EmployeeDataFromAPI {
   ID: string;
