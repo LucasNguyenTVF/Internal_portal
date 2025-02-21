@@ -21,7 +21,7 @@ export const EmployeeDirectory: React.FC<EmployeeDirectoryProps> = ({
   reportTo,
 }) => {
   return (
-    <div className="w-full p-6 bg-gray-900 text-white min-h-screen">
+    <div className="w-full p-6 bg-gray-900 text-white h-fit">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-lg font-medium mb-6">
           People reporting to {reportTo}
@@ -32,10 +32,6 @@ export const EmployeeDirectory: React.FC<EmployeeDirectoryProps> = ({
             DisplayEmployeeInfo(employee, getInitials)
           )}
         </div>
-
-        <button className="mt-4 px-4 py-2 text-gray-400 hover:text-white transition-colors rounded-md hover:bg-gray-800">
-          See more
-        </button>
       </div>
     </div>
   );
@@ -57,11 +53,11 @@ export const DisplayEmployeeInfo = (
   return (
     <div
       key={employee.id}
-      className="bg-gray-800 rounded-lg p-3 border border-gray-700 hover:bg-gray-750 transition-colors"
-      onClick={onClickDetail(employee)}
+      className="bg-gray-800 rounded-lg p-3 border border-gray-700 hover:bg-gray-750 transition-colors w-full sm:w-auto"
+      onClick={() => onClickDetail(employee)}
     >
-      <div className="flex items-center gap-3">
-        <div className="relative flex-shrink-0">
+      <div className="flex flex-col sm:flex-row items-center gap-3">
+        <div className="relative flex-shrink-0 w-16 sm:w-auto">
           <Avatar
             src={employee.image}
             alt={employee.fullName}
@@ -69,12 +65,12 @@ export const DisplayEmployeeInfo = (
           />
         </div>
 
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-col gap-2 items-baseline truncate mr-3">
-            <span className="text-sm text-gray-400 truncate">
+        <div className="min-w-0 flex-1 w-full">
+          <div className="flex flex-col gap-2 items-center sm:items-start text-center sm:text-left">
+            <span className="text-sm text-gray-400 truncate w-full">
               {employee.account}
             </span>
-            <p className="text-xs text-gray-400 truncate">
+            <p className="text-xs text-gray-400 truncate w-full">
               {employee.position}
             </p>
           </div>

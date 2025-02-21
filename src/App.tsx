@@ -75,22 +75,40 @@ const buildEmployeeHierarchy = (flatData: EmployeeDataFromAPI[]) => {
   };
 };
 
-const transformExcelDataToHierarchy = (excelData) => {
+interface ParsedRow {
+  [key: string]: any;
+}
+
+interface TransformedData {
+  data: EmployeeDataFromAPI[];
+  lines: string[];
+  departments: string[];
+  childOfDepartment: string[];
+  subChildOfDepartment: string[];
+}
+
+const transformExcelDataToHierarchy = (excelData: any[]): TransformedData => {
   if (!Array.isArray(excelData) || excelData.length === 0) {
-    return { data: [], lines: [] };
+    return {
+      data: [],
+      lines: [],
+      departments: [],
+      childOfDepartment: [],
+      subChildOfDepartment: [],
+    };
   }
 
   const titleColumn = excelData[0];
   const headers = Object.keys(titleColumn).filter((key) => key !== "__EMPTY");
-  const lines = new Set() as Set<string>;
-  const departments = new Set() as Set<string>;
-  const childOfDepartment = new Set() as Set<string>;
-  const subChildOfDepartment = new Set() as Set<string>;
+  const lines = new Set<string>();
+  const departments = new Set<string>();
+  const childOfDepartment = new Set<string>();
+  const subChildOfDepartment = new Set<string>();
 
   const parsedData = excelData
     .slice(1)
     .map((row) => {
-      const parsedRow = {};
+      const parsedRow: ParsedRow = {};
 
       headers.forEach((key) => {
         const columnName = titleColumn[key];
@@ -126,10 +144,10 @@ const transformExcelDataToHierarchy = (excelData) => {
 
   return {
     data: parsedData,
-    lines: Array.from(lines) as Array<string>,
-    departments: Array.from(departments) as Array<string>,
-    childOfDepartment: Array.from(childOfDepartment) as Array<string>,
-    subChildOfDepartment: Array.from(subChildOfDepartment) as Array<string>,
+    lines: Array.from(lines),
+    departments: Array.from(departments),
+    childOfDepartment: Array.from(childOfDepartment),
+    subChildOfDepartment: Array.from(subChildOfDepartment),
   };
 };
 
@@ -253,7 +271,6 @@ const Homepage = () => {
     if (anotherEmploytList.length > 0) {
       anotherEmploytList.forEach((employee) => {
         if (employee["Department"] === dept && employee["Leader"] === true) {
-          console.log("employee", employee);
           const employeeNode = {
             expanded: true,
             type: "person",
@@ -289,6 +306,8 @@ const Homepage = () => {
   };
 
   const constructDataForLines = (project: string) => {
+    console.log("🚀 ~ constructDataForLines ~ project:", project);
+    console.log("🚀 ~ lines.forEach ~ lines:", lines);
     const data = [];
 
     lines.forEach((line) => {
@@ -311,21 +330,6 @@ const Homepage = () => {
   const constructDataForProjects = (project: string) => {
     const data = [];
 
-    if (anotherEmploytList.length === 0) {
-      return data;
-    }
-
-    anotherEmploytList.forEach((empl) => {
-      if (empl["Line"] === project) {
-        const projectNode = {
-          expanded: true,
-          type: "person",
-          data: parseDataFromAPI(empl),
-          children: [],
-        };
-        data.push(projectNode);
-      }
-    });
     return data;
   };
 

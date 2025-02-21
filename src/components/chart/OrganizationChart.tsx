@@ -100,12 +100,13 @@ const OrganizationChart = ({ data }: { data: EmployeeNode[] }) => {
     const isExpanded = expandedNodes.has(node.data.id);
     const { parent } = findNodeRecursive(data, node.data.id);
 
-    // Hide inactive siblings
-    if (parent && activeChild && activeChild !== node.data.id) {
-      if (parent.children?.some((child) => child.data.id === activeChild)) {
-        return null;
-      }
-    }
+    // Hide inactive siblings and it siblings of parent and ancestors
+
+    // if (parent && activeChild && activeChild !== node.data.id) {
+    //   if (parent.children?.some((child) => child.data.id === activeChild)) {
+    //     return null;
+    //   }
+    // }
 
     const dataEmployess: EmployeeData[] = node.children.map(
       (child) => child.data
