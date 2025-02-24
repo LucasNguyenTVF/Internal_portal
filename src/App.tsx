@@ -330,6 +330,21 @@ const Homepage = () => {
   const constructDataForProjects = (project: string) => {
     const data = [];
 
+    if (anotherEmploytList.length === 0) {
+      return data;
+    }
+
+    anotherEmploytList.forEach((empl) => {
+      if (empl["Line"] === project) {
+        const projectNode = {
+          expanded: true,
+          type: "person",
+          data: parseDataFromAPI(empl),
+          children: [],
+        };
+        data.push(projectNode);
+      }
+    });
     return data;
   };
 
