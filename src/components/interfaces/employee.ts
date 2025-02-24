@@ -34,4 +34,5 @@ export interface EmployeeDataFromAPI {
   ManagerId: string;
   ManagerName: string;
   Leadership: boolean;
+  "Work With": string;
 }

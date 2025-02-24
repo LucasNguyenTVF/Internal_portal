@@ -85,6 +85,7 @@ interface TransformedData {
   departments: string[];
   childOfDepartment: string[];
   subChildOfDepartment: string[];
+  workWiths: string[];
 }
 
 const transformExcelDataToHierarchy = (excelData: any[]): TransformedData => {
@@ -104,6 +105,7 @@ const transformExcelDataToHierarchy = (excelData: any[]): TransformedData => {
   const departments = new Set<string>();
   const childOfDepartment = new Set<string>();
   const subChildOfDepartment = new Set<string>();
+  const workWiths = new Set<string>();
 
   const parsedData = excelData
     .slice(1)
@@ -135,6 +137,10 @@ const transformExcelDataToHierarchy = (excelData: any[]): TransformedData => {
           if (columnName === "Team" && value !== "None" && value !== "​") {
             subChildOfDepartment.add(value);
           }
+
+          if (columnName === "Work With" && value !== "None" && value !== "​") {
+            workWiths.add(value);
+          }
         }
       });
 
@@ -148,6 +154,7 @@ const transformExcelDataToHierarchy = (excelData: any[]): TransformedData => {
     departments: Array.from(departments),
     childOfDepartment: Array.from(childOfDepartment),
     subChildOfDepartment: Array.from(subChildOfDepartment),
+    workWiths: Array.from(workWiths),
   };
 };
 
@@ -159,6 +166,7 @@ const Homepage = () => {
   const [anotherEmploytList, setAnotherEmploytList] = useState<
     EmployeeDataFromAPI[]
   >([]);
+
   const [internalPortalData, setInternalPortalData] = useState<EmployeeNode[]>(
     []
   );
@@ -173,6 +181,8 @@ const Homepage = () => {
     []
   );
   const [projects, setProjects] = useState<string[]>([]);
+  const [workWiths, setWorkWiths] = useState<string[]>([]);
+
   const [uniqueData, setUniqueData] = useState<EmployeeNode[]>([
     {
       expanded: true,
@@ -221,6 +231,8 @@ const Homepage = () => {
       );
 
       setAnotherEmploytList(transformedEmployeeData.data);
+      setWorkWiths(transformedEmployeeData.workWiths);
+
       adoptChildToParent();
       // const employeeHierarchy = buildEmployeeHierarchy(
       //   transformedEmployeeData.data
@@ -297,7 +309,7 @@ const Homepage = () => {
             nameBlock: team,
             id: randomId(),
           },
-          children: constructDataForLines(team),
+          children: constructPMOForLines(team),
         };
         data.push(teamNode);
       }
@@ -305,13 +317,28 @@ const Homepage = () => {
     return data;
   };
 
-  const constructDataForLines = (project: string) => {
-    console.log("🚀 ~ constructDataForLines ~ project:", project);
-    console.log("🚀 ~ lines.forEach ~ lines:", lines);
+  const constructPMOForLines = (project: string) => {
     const data = [];
+    const listBossOfLine: { [key: string]: string[] } = {};
 
     lines.forEach((line) => {
-      if (project === "Delivery") {
+      listBossOfLine[line] = [];
+    });
+
+    workWiths.map((ww) => {
+      const employee = anotherEmploytList.find((w) => {
+        return w.Account === ww;
+      });
+
+      const lineOfEmployee = employee?.Line;
+
+      if (lineOfEmployee) {
+        listBossOfLine[lineOfEmployee].push(ww);
+      }
+    });
+
+    if (project === "Delivery") {
+      lines.forEach((line) => {
         const lineNode = {
           expanded: true,
           type: "block",
@@ -319,36 +346,70 @@ const Homepage = () => {
             nameBlock: line,
             id: randomId(),
           },
-          children: constructDataForProjects(line),
+          children: constructDataForBoss(line, listBossOfLine),
         };
         data.push(lineNode);
-      }
-    });
-    return data;
-  };
-
-  const constructDataForProjects = (project: string) => {
-    const data = [];
-
-    if (anotherEmploytList.length === 0) {
-      return data;
+      });
     }
 
-    anotherEmploytList.forEach((empl) => {
-      if (empl["Line"] === project) {
-        const projectNode = {
-          expanded: true,
-          type: "person",
-          data: parseDataFromAPI(empl),
-          children: [],
-        };
-        data.push(projectNode);
-      }
+    return data;
+  };
+
+  const constructDataForBoss = (line: string, listBossOfLine) => {
+    const data = [];
+    listBossOfLine[line].forEach((boss) => {
+      const bossNode = {
+        expanded: true,
+        type: "person",
+        data: parseDataFromAPI(
+          anotherEmploytList.filter((e) => e.Account === boss)[0]
+        ),
+        children: constructDataForProjects(boss),
+      };
+      data.push(bossNode);
     });
     return data;
   };
 
+  const constructDataForProjects = (boss: string) => {
+    const data = [];
+
+    // construct data for workwith
+
+    anotherEmploytList.forEach((employee) => {
+      if (boss === employee["Work With"]) {
+        const workWithNode = {
+          expanded: true,
+          type: "person",
+          data: parseDataFromAPI(employee),
+          children: [],
+        };
+        data.push(workWithNode);
+      }
+    });
+
+    return data;
+  };
+
+  const constructDataForEmployees = (project: string) => {
+    const data = [];
+
+    anotherEmploytList.forEach((employee) => {
+      if (employee["Work With"] === project) {
+        const employeeNode = {
+          expanded: true,
+          type: "person",
+          data: parseDataFromAPI(employee),
+          children: [],
+        };
+        data.push(employeeNode);
+      }
+    });
+
+    return data;
+  };
   const openSubMenu = (subMenu: any) => {
+    console.log("project", workWiths);
     if (selectedMenu === subMenu) {
       setIsShow(!isShow);
       return;
