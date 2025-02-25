@@ -15,6 +15,7 @@ export interface EmployeeNode {
   type: TypeNode;
   data: EmployeeData;
   children: EmployeeNode[];
+  lastLevel?: boolean;
 }
 
 export type TypeNode = "person" | "block";

@@ -233,21 +233,11 @@ const Homepage = () => {
       setAnotherEmploytList(transformedEmployeeData.data);
       setWorkWiths(transformedEmployeeData.workWiths);
 
-      adoptChildToParent();
-      // const employeeHierarchy = buildEmployeeHierarchy(
-      //   transformedEmployeeData.data
-      // );
-
-      // const leaderships = employeeHierarchy.leaderships.map((item) => {
-      //   return parseDataFromAPI(item);
-      // });
-
-      // setLeaderShips(leaderships);
-      // setInternalPortalData(employeeHierarchy.data);
+      buildDepartmentTree();
     }
   }, [employeeList]);
 
-  const adoptChildToParent = () => {
+  const buildDepartmentTree = () => {
     const data = [];
 
     // init data department
@@ -259,7 +249,7 @@ const Homepage = () => {
           nameBlock: dept,
           id: randomId(),
         },
-        children: constructDataForDepartment(dept),
+        children: buildDepartmentEmployeeTree(dept),
       };
       data.push(departmentNode);
     });
@@ -277,7 +267,7 @@ const Homepage = () => {
     ]);
   };
 
-  const constructDataForDepartment = (dept: string) => {
+  const buildDepartmentEmployeeTree = (dept: string) => {
     const data = [];
 
     if (anotherEmploytList.length > 0) {
@@ -287,7 +277,7 @@ const Homepage = () => {
             expanded: true,
             type: "person",
             data: parseDataFromAPI(employee),
-            children: constructDataForTeams(employee["Team"]),
+            children: buildTeamHierarchy(employee["Team"]),
           };
           data.push(employeeNode);
         }
@@ -297,7 +287,7 @@ const Homepage = () => {
     return data;
   };
 
-  const constructDataForTeams = (child: string) => {
+  const buildTeamHierarchy = (child: string) => {
     const data = [];
 
     subChildOfDepartment.forEach((team) => {
@@ -309,7 +299,7 @@ const Homepage = () => {
             nameBlock: team,
             id: randomId(),
           },
-          children: constructPMOForLines(team),
+          children: buildDeliveryLinesStructure(team),
         };
         data.push(teamNode);
       }
@@ -317,7 +307,7 @@ const Homepage = () => {
     return data;
   };
 
-  const constructPMOForLines = (project: string) => {
+  const buildDeliveryLinesStructure = (project: string) => {
     const data = [];
     const listBossOfLine: { [key: string]: string[] } = {};
 
@@ -346,7 +336,7 @@ const Homepage = () => {
             nameBlock: line,
             id: randomId(),
           },
-          children: constructDataForBoss(line, listBossOfLine),
+          children: buildBossDataHierarchy(line, listBossOfLine),
         };
         data.push(lineNode);
       });
@@ -355,7 +345,7 @@ const Homepage = () => {
     return data;
   };
 
-  const constructDataForBoss = (line: string, listBossOfLine) => {
+  const buildBossDataHierarchy = (line: string, listBossOfLine) => {
     const data = [];
     listBossOfLine[line].forEach((boss) => {
       const bossNode = {
@@ -364,14 +354,15 @@ const Homepage = () => {
         data: parseDataFromAPI(
           anotherEmploytList.filter((e) => e.Account === boss)[0]
         ),
-        children: constructDataForProjects(boss),
+        children: buildEmployeeWorkRelations(boss),
+        lastLevel: true,
       };
       data.push(bossNode);
     });
     return data;
   };
 
-  const constructDataForProjects = (boss: string) => {
+  const buildEmployeeWorkRelations = (boss: string) => {
     const data = [];
 
     // construct data for workwith
@@ -391,23 +382,6 @@ const Homepage = () => {
     return data;
   };
 
-  const constructDataForEmployees = (project: string) => {
-    const data = [];
-
-    anotherEmploytList.forEach((employee) => {
-      if (employee["Work With"] === project) {
-        const employeeNode = {
-          expanded: true,
-          type: "person",
-          data: parseDataFromAPI(employee),
-          children: [],
-        };
-        data.push(employeeNode);
-      }
-    });
-
-    return data;
-  };
   const openSubMenu = (subMenu: any) => {
     console.log("project", workWiths);
     if (selectedMenu === subMenu) {

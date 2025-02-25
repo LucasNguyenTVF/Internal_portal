@@ -102,15 +102,16 @@ const OrganizationChart = ({ data }: { data: EmployeeNode[] }) => {
 
     // Hide inactive siblings and it siblings of parent and ancestors
 
-    // if (parent && activeChild && activeChild !== node.data.id) {
-    //   if (parent.children?.some((child) => child.data.id === activeChild)) {
-    //     return null;
-    //   }
-    // }
+    if (parent && activeChild && activeChild !== node.data.id) {
+      if (parent.children?.some((child) => child.data.id === activeChild)) {
+        return null;
+      }
+    }
 
     const dataEmployess: EmployeeData[] = node.children.map(
       (child) => child.data
     );
+
     return (
       <div key={node.data.id} className="flex flex-col items-center">
         <ChartLevel
@@ -123,7 +124,7 @@ const OrganizationChart = ({ data }: { data: EmployeeNode[] }) => {
             ref={childrenRef}
             className="flex flex-row justify-center items-start gap-x-2 md:gap-x-4 lg:gap-x-6 gap-y-3 md:gap-y-6 lg:gap-y-8 m-3 md:m-4 lg:m-6"
           >
-            {node.children.length > 6 ? (
+            {node.children.length >= 4 && node.lastLevel ? (
               <EmployeeDirectory
                 employees={dataEmployess}
                 reportTo={node.data.fullName}
