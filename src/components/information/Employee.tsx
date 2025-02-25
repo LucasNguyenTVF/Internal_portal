@@ -21,12 +21,8 @@ export const EmployeeDirectory: React.FC<EmployeeDirectoryProps> = ({
   reportTo,
 }) => {
   return (
-    <div className="w-full p-6 bg-gray-900 text-white h-fit">
+    <div className="w-full p-2 text-white h-fit">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-lg font-medium mb-6">
-          People reporting to {reportTo}
-        </h2>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {employees.map((employee) =>
             DisplayEmployeeInfo(employee, getInitials)
@@ -53,11 +49,11 @@ export const DisplayEmployeeInfo = (
   return (
     <div
       key={employee.id}
-      className="bg-gray-800 rounded-lg p-3 border border-gray-700 hover:bg-gray-750 transition-colors w-full sm:w-auto"
+      className="bg-[linear-gradient(90deg,_#03081A_0%,_#012756_100%)] border shadow-md border-gray-800 rounded-lg px-1.5 py-2 hover:bg-gray-750 transition-colors w-full sm:w-auto"
       onClick={() => onClickDetail(employee)}
     >
-      <div className="flex flex-col sm:flex-row items-center gap-3">
-        <div className="relative flex-shrink-0 w-16 sm:w-auto">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="sm:w-auto">
           <Avatar
             src={employee.image}
             alt={employee.fullName}
@@ -66,11 +62,11 @@ export const DisplayEmployeeInfo = (
         </div>
 
         <div className="min-w-0 flex-1 w-full">
-          <div className="flex flex-col gap-2 items-center sm:items-start text-center sm:text-left">
-            <span className="text-sm text-gray-400 truncate w-full">
+          <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
+            <span className="text-xs text-white truncate w-full">
               {employee.account}
             </span>
-            <p className="text-xs text-gray-400 truncate w-full">
+            <p className="text-[10px] text-[#2A88FF] truncate w-full">
               {employee.position}
             </p>
           </div>

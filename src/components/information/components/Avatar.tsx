@@ -8,7 +8,7 @@ interface AvatarProps {
 
 export function Avatar({ src, alt, fallback }: AvatarProps) {
   return (
-    <div className="relative inline-block">
+    <div className="">
       {src ? (
         <img
           src={src || "/placeholder.svg"}

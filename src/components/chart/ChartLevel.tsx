@@ -4,6 +4,7 @@ import { EmployeeNode, ETypeNode } from "../interfaces/employee";
 import InteractiveGradientButton from "../information/Button";
 import { randomId } from "../../App";
 import { DisplayEmployeeInfo, getInitials } from "../information/Employee";
+import arrowIcon from "../../assets/arrow.svg";
 
 interface ChartLevelProps {
   node: EmployeeNode;
@@ -26,21 +27,14 @@ const ChartLevel = ({
           {DisplayEmployeeInfo(node.data, getInitials)}
 
           {hasChildren && (
-            <>
-              {isExpanded ? (
-                <span
-                  className="pi pi-angle-up cursor-pointer"
-                  style={{ color: "green", fontSize: "1.5rem" }}
-                  onClick={() => onToggleExpand(node.data.id)}
-                ></span>
-              ) : (
-                <span
-                  className="pi pi-angle-down cursor-pointer"
-                  style={{ color: "green", fontSize: "1.5rem" }}
-                  onClick={() => onToggleExpand(node.data.id)}
-                ></span>
-              )}
-            </>
+            <img
+              onClick={() => onToggleExpand(node.data.id)}
+              src={arrowIcon}
+              className={`w-4 h-4 mx-auto mt-3 transition-transform duration-300 ${
+                isExpanded ? "rotate-180" : ""
+              }`}
+              alt="arrow icon"
+            />
           )}
         </div>
       ) : (
