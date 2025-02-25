@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Children, useState } from "react";
 import "./App.css";
 import OrganizationChart from "./components/chart/OrganizationChart";
 import Header from "./components/header/Header";
@@ -308,6 +308,25 @@ const Homepage = () => {
   };
 
   const buildDeliveryLinesStructure = (project: string) => {
+    const teamLinesMap: Record<string, string[]> = {};
+
+    subChildOfDepartment.forEach((team) => {
+      if (!team) return;
+
+      anotherEmploytList.forEach((employee) => {
+        const employeeTeam = employee["Team"];
+        const employeeLine = employee["Line"];
+
+        if (!employeeTeam || !employeeLine) return;
+        if (employeeTeam === team) {
+          teamLinesMap[team] ??= [];
+          if (!teamLinesMap[team].includes(employeeLine)) {
+            teamLinesMap[team].push(employeeLine);
+          }
+        }
+      });
+    });
+
     const data = [];
     const listBossOfLine: { [key: string]: string[] } = {};
 
@@ -327,26 +346,26 @@ const Homepage = () => {
       }
     });
 
-    if (project === "Delivery") {
-      lines.forEach((line) => {
-        const lineNode = {
-          expanded: true,
-          type: "block",
-          data: {
-            nameBlock: line,
-            id: randomId(),
-          },
-          children: buildBossDataHierarchy(line, listBossOfLine),
-        };
-        data.push(lineNode);
-      });
-    }
+    teamLinesMap[project].map((line) => {
+      const lineNode = {
+        expanded: true,
+        type: "block",
+        data: {
+          nameBlock: line,
+          id: randomId(),
+        },
+        children: buildBossDataHierarchy(line, listBossOfLine),
+      };
+      data.push(lineNode);
+    });
 
     return data;
   };
 
   const buildBossDataHierarchy = (line: string, listBossOfLine) => {
     const data = [];
+    if (!listBossOfLine) return data;
+    if (!listBossOfLine[line]) return data;
     listBossOfLine[line].forEach((boss) => {
       const bossNode = {
         expanded: true,
