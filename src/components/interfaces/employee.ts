@@ -7,13 +7,21 @@ export interface EmployeeData {
   fullName: string;
   email: string;
   managerName: string;
+  nameBlock?: string;
 }
 
 export interface EmployeeNode {
   expanded: boolean;
-  type: string;
+  type: TypeNode;
   data: EmployeeData;
   children: EmployeeNode[];
+  lastLevel?: boolean;
+}
+
+export type TypeNode = "person" | "block";
+export enum ETypeNode {
+  Person = "person",
+  Block = "block",
 }
 
 export interface EmployeeDataFromAPI {
@@ -27,4 +35,5 @@ export interface EmployeeDataFromAPI {
   ManagerId: string;
   ManagerName: string;
   Leadership: boolean;
+  "Work With": string;
 }

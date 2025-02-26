@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Children, useState } from "react";
 import "./App.css";
 import OrganizationChart from "./components/chart/OrganizationChart";
 import Header from "./components/header/Header";
@@ -12,43 +12,22 @@ import {
 } from "./components/interfaces/employee";
 
 const linkExcel = import.meta.env.VITE_LINK_EXCEL;
-
-const transformExcelDataToHierarchy = (excelData) => {
-  if (!Array.isArray(excelData) || excelData.length === 0) {
-    return { data: [], lines: [] };
+export const randomId = () => Math.random().toString(36).substr(2, 9);
+const parseDataFromAPI = (data: EmployeeDataFromAPI): EmployeeData => {
+  if (!data) {
+    return {
+      id: "",
+      account: "",
+      position: "",
+      line: "",
+      fullName: "",
+      email: "",
+      managerName: "",
+    };
   }
 
-  const titleColumn = excelData[0];
-  const headers = Object.keys(titleColumn).filter((key) => key !== "__EMPTY");
-  const lines = new Set() as Set<string>;
-
-  const parsedData = excelData
-    .slice(1)
-    .map((row) => {
-      const parsedRow = {};
-
-      headers.forEach((key) => {
-        const columnName = titleColumn[key];
-        const value = row[key];
-        if (value !== undefined) {
-          parsedRow[columnName] = value;
-
-          if (columnName === "Line" && value !== "None") {
-            lines.add(value);
-          }
-        }
-      });
-
-      return parsedRow;
-    })
-    .filter((row) => Object.keys(row).length > 0) as EmployeeDataFromAPI[];
-
-  return { data: parsedData, lines: Array.from(lines) as Array<string> };
-};
-
-const parseDataFromAPI = (data: EmployeeDataFromAPI): EmployeeData => {
   return {
-    id: data?.ID,
+    id: randomId(),
     image: data?.Image,
     account: data?.Account,
     position: data?.Position,
@@ -96,11 +75,98 @@ const buildEmployeeHierarchy = (flatData: EmployeeDataFromAPI[]) => {
   };
 };
 
+interface ParsedRow {
+  [key: string]: any;
+}
+
+interface TransformedData {
+  data: EmployeeDataFromAPI[];
+  lines: string[];
+  departments: string[];
+  childOfDepartment: string[];
+  subChildOfDepartment: string[];
+  workWiths: string[];
+}
+
+const transformExcelDataToHierarchy = (excelData: any[]): TransformedData => {
+  if (!Array.isArray(excelData) || excelData.length === 0) {
+    return {
+      data: [],
+      lines: [],
+      departments: [],
+      childOfDepartment: [],
+      subChildOfDepartment: [],
+    };
+  }
+
+  const titleColumn = excelData[0];
+  const headers = Object.keys(titleColumn).filter((key) => key !== "__EMPTY");
+  const lines = new Set<string>();
+  const departments = new Set<string>();
+  const childOfDepartment = new Set<string>();
+  const subChildOfDepartment = new Set<string>();
+  const workWiths = new Set<string>();
+
+  const parsedData = excelData
+    .slice(1)
+    .map((row) => {
+      const parsedRow: ParsedRow = {};
+
+      headers.forEach((key) => {
+        const columnName = titleColumn[key];
+        const value = row[key];
+        if (value !== undefined) {
+          parsedRow[columnName] = value;
+
+          if (columnName === "Line" && value !== "None" && value !== "​") {
+            lines.add(value);
+          }
+
+          if (
+            columnName === "Department" &&
+            value !== "None" &&
+            value !== "​"
+          ) {
+            departments.add(value);
+          }
+
+          if (columnName === "Leader" && value === true && value !== "​") {
+            childOfDepartment.add(row["B"]);
+          }
+
+          if (columnName === "Team" && value !== "None" && value !== "​") {
+            subChildOfDepartment.add(value);
+          }
+
+          if (columnName === "Work With" && value !== "None" && value !== "​") {
+            workWiths.add(value);
+          }
+        }
+      });
+
+      return parsedRow;
+    })
+    .filter((row) => Object.keys(row).length > 0) as EmployeeDataFromAPI[];
+
+  return {
+    data: parsedData,
+    lines: Array.from(lines),
+    departments: Array.from(departments),
+    childOfDepartment: Array.from(childOfDepartment),
+    subChildOfDepartment: Array.from(subChildOfDepartment),
+    workWiths: Array.from(workWiths),
+  };
+};
+
 const Homepage = () => {
   const [selectedMenu, setSelectedMenu] = useState("");
   const [isShow, setIsShow] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [employeeList, setEmployeeList] = useState<EmployeeDataFromAPI[]>([]);
+  const [anotherEmploytList, setAnotherEmploytList] = useState<
+    EmployeeDataFromAPI[]
+  >([]);
+
   const [internalPortalData, setInternalPortalData] = useState<EmployeeNode[]>(
     []
   );
@@ -109,6 +175,25 @@ const Homepage = () => {
   const [selectedEmployees, setSelectedEmployees] = useState<EmployeeNode[]>(
     []
   );
+  const [department, setDepartment] = useState<string[]>([]);
+  const [childOfDepartment, setChildOfDepartment] = useState<string[]>([]);
+  const [subChildOfDepartment, setSubChildOfDepartment] = useState<string[]>(
+    []
+  );
+  const [projects, setProjects] = useState<string[]>([]);
+  const [workWiths, setWorkWiths] = useState<string[]>([]);
+
+  const [uniqueData, setUniqueData] = useState<EmployeeNode[]>([
+    {
+      expanded: true,
+      type: "block",
+      data: {
+        nameBlock: "Global",
+        id: randomId(),
+      },
+      children: [],
+    },
+  ]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,8 +204,10 @@ const Homepage = () => {
         const sheetName = workbook.SheetNames;
         const listEmployee = sheetName[0];
         const worksheet = workbook.Sheets[listEmployee];
+
         const jsonData: EmployeeDataFromAPI[] =
           xlsx.utils.sheet_to_json(worksheet);
+
         setEmployeeList(jsonData);
       } catch (error) {
         console.error("Error fetching or parsing the Excel file:", error);
@@ -133,20 +220,189 @@ const Homepage = () => {
     if (employeeList.length > 0) {
       const transformedEmployeeData =
         transformExcelDataToHierarchy(employeeList);
+
       const { lines } = transformedEmployeeData;
       setLines(lines);
-      const employeeHierarchy = buildEmployeeHierarchy(
-        transformedEmployeeData.data
+
+      setDepartment(transformedEmployeeData.departments || []);
+      setChildOfDepartment(transformedEmployeeData.childOfDepartment || []);
+      setSubChildOfDepartment(
+        transformedEmployeeData.subChildOfDepartment || []
       );
-      const leaderships = employeeHierarchy.leaderships.map((item) => {
-        return parseDataFromAPI(item);
-      });
-      setLeaderShips(leaderships);
-      setInternalPortalData(employeeHierarchy.data);
+
+      setAnotherEmploytList(transformedEmployeeData.data);
+      setWorkWiths(transformedEmployeeData.workWiths);
+
+      buildDepartmentTree();
     }
   }, [employeeList]);
 
-  const openSubMenu = (subMenu) => {
+  const buildDepartmentTree = () => {
+    const data = [];
+
+    // init data department
+    department.forEach((dept) => {
+      const departmentNode = {
+        expanded: true,
+        type: "block",
+        data: {
+          nameBlock: dept,
+          id: randomId(),
+        },
+        children: buildDepartmentEmployeeTree(dept),
+      };
+      data.push(departmentNode);
+    });
+
+    setUniqueData([
+      {
+        expanded: true,
+        type: "block",
+        data: {
+          nameBlock: "Global",
+          id: randomId(),
+        },
+        children: data,
+      },
+    ]);
+  };
+
+  const buildDepartmentEmployeeTree = (dept: string) => {
+    const data = [];
+
+    if (anotherEmploytList.length > 0) {
+      anotherEmploytList.forEach((employee) => {
+        if (employee["Department"] === dept && employee["Leader"] === true) {
+          const employeeNode = {
+            expanded: true,
+            type: "person",
+            data: parseDataFromAPI(employee),
+            children: buildTeamHierarchy(employee["Team"]),
+          };
+          data.push(employeeNode);
+        }
+      });
+    }
+
+    return data;
+  };
+
+  const buildTeamHierarchy = (child: string) => {
+    const data = [];
+
+    subChildOfDepartment.forEach((team) => {
+      if (team === child) {
+        const teamNode = {
+          expanded: true,
+          type: "block",
+          data: {
+            nameBlock: team,
+            id: randomId(),
+          },
+          children: buildDeliveryLinesStructure(team),
+        };
+        data.push(teamNode);
+      }
+    });
+    return data;
+  };
+
+  const buildDeliveryLinesStructure = (project: string) => {
+    const teamLinesMap: Record<string, string[]> = {};
+
+    subChildOfDepartment.forEach((team) => {
+      if (!team) return;
+
+      anotherEmploytList.forEach((employee) => {
+        const employeeTeam = employee["Team"];
+        const employeeLine = employee["Line"];
+
+        if (!employeeTeam || !employeeLine) return;
+        if (employeeTeam === team) {
+          teamLinesMap[team] ??= [];
+          if (!teamLinesMap[team].includes(employeeLine)) {
+            teamLinesMap[team].push(employeeLine);
+          }
+        }
+      });
+    });
+
+    const data = [];
+    const listBossOfLine: { [key: string]: string[] } = {};
+
+    lines.forEach((line) => {
+      listBossOfLine[line] = [];
+    });
+
+    workWiths.map((ww) => {
+      const employee = anotherEmploytList.find((w) => {
+        return w.Account === ww;
+      });
+
+      const lineOfEmployee = employee?.Line;
+
+      if (lineOfEmployee) {
+        listBossOfLine[lineOfEmployee].push(ww);
+      }
+    });
+
+    teamLinesMap[project].map((line) => {
+      const lineNode = {
+        expanded: true,
+        type: "block",
+        data: {
+          nameBlock: line,
+          id: randomId(),
+        },
+        children: buildBossDataHierarchy(line, listBossOfLine),
+      };
+      data.push(lineNode);
+    });
+
+    return data;
+  };
+
+  const buildBossDataHierarchy = (line: string, listBossOfLine) => {
+    const data = [];
+    if (!listBossOfLine) return data;
+    if (!listBossOfLine[line]) return data;
+    listBossOfLine[line].forEach((boss) => {
+      const bossNode = {
+        expanded: true,
+        type: "person",
+        data: parseDataFromAPI(
+          anotherEmploytList.filter((e) => e.Account === boss)[0]
+        ),
+        children: buildEmployeeWorkRelations(boss),
+        lastLevel: true,
+      };
+      data.push(bossNode);
+    });
+    return data;
+  };
+
+  const buildEmployeeWorkRelations = (boss: string) => {
+    const data = [];
+
+    // construct data for workwith
+
+    anotherEmploytList.forEach((employee) => {
+      if (boss === employee["Work With"]) {
+        const workWithNode = {
+          expanded: true,
+          type: "person",
+          data: parseDataFromAPI(employee),
+          children: [],
+        };
+        data.push(workWithNode);
+      }
+    });
+
+    return data;
+  };
+
+  const openSubMenu = (subMenu: any) => {
+    console.log("project", workWiths);
     if (selectedMenu === subMenu) {
       setIsShow(!isShow);
       return;
@@ -169,14 +425,14 @@ const Homepage = () => {
   return (
     <div>
       <Header />
-      <div className="min-h-screen p-4 md:p-12">
+      <div className="min-h-screen p-4 md:p-12 overflow-y-auto">
         <Information
           subMenu={selectedMenu}
           openSubMenu={openSubMenu}
           lines={lines}
           leaderships={leaderships}
         />
-        {isShow && !loading && <OrganizationChart data={selectedEmployees} />}
+        <OrganizationChart data={uniqueData} />
       </div>
     </div>
   );
